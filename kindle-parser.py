@@ -17,4 +17,3 @@ for line in strings:
         books[book_title].append(book_clippings)
 
 print(books.keys())
-print(books["Make It Stick (Peter C. Brown)"])
