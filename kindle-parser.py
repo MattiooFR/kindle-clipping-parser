@@ -37,16 +37,19 @@ with open('My Clippings.txt', 'r', encoding='utf8') as reader:
 
 for line in strings:
     book_title = line.strip().split("\n")[0]
-    Library.addBook(Book(book_title))
 
-    book_clippings = "\n".join(line.split("\n")[3:])
-    print(book_clippings)
+    book_clippings = "".join(line.split("\n")[3:])
 
     if not Library.getBook(book_title):
+        Library.addBook(Book(book_title))
         Library.books[book_title].clippings = [book_clippings]
     else:
-        Library.books[book_title].clippings.append(book_clippings)
+        if book_clippings.strip().find(Library.books[book_title].clippings[-1].strip()) != -1:
+            Library.books[book_title].clippings[-1] = book_clippings
+        else:
+            Library.books[book_title].clippings.append(book_clippings)
 
 
-print(Library)
-#print(Library.books['The Elon Musk Blog Series: Wait But Why (Urban, Tim)'])
+print(Library.books.keys())
+print(Library.getBook('Everyday Zen (Charlotte J. Beck)'))
+print(Library.getBook('The Elon Musk Blog Series: Wait But Why (Urban, Tim)'))
