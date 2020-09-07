@@ -16,6 +16,24 @@ class Books:
     def __str__(self):
         return "Books in library : " + ", ".join([key for key in self.books.keys()])[:-2]
 
+    def importClippings(self, location='My Clippings.txt'):
+        with open('My Clippings.txt', 'r', encoding='utf8') as reader:
+            strings = re.split(r'==========', reader.read())
+
+        for line in strings:
+            book_title = line.strip().split("\n")[0]
+
+            book_clippings = "".join(line.split("\n")[3:])
+
+            if not Library.getBook(book_title):
+                Library.addBook(Book(book_title))
+                Library.books[book_title].clippings = [book_clippings]
+            else:
+                if book_clippings.strip().find(Library.books[book_title].clippings[-1].strip()) != -1:
+                    Library.books[book_title].clippings[-1] = book_clippings
+                else:
+                    Library.books[book_title].clippings.append(book_clippings)
+
 
 class Book:
 
@@ -31,25 +49,7 @@ class Book:
 
 
 Library = Books()
-
-with open('My Clippings.txt', 'r', encoding='utf8') as reader:
-    strings = re.split(r'==========', reader.read())
-
-for line in strings:
-    book_title = line.strip().split("\n")[0]
-
-    book_clippings = "".join(line.split("\n")[3:])
-
-    if not Library.getBook(book_title):
-        Library.addBook(Book(book_title))
-        Library.books[book_title].clippings = [book_clippings]
-    else:
-        if book_clippings.strip().find(Library.books[book_title].clippings[-1].strip()) != -1:
-            Library.books[book_title].clippings[-1] = book_clippings
-        else:
-            Library.books[book_title].clippings.append(book_clippings)
+Library.importClippings()
 
 
-print(Library.books.keys())
-print(Library.getBook('Everyday Zen (Charlotte J. Beck)'))
-print(Library.getBook('The Elon Musk Blog Series: Wait But Why (Urban, Tim)'))
+print(Library)
