@@ -17,6 +17,6 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    path('', include('clippingsParser.urls')),
+    path('my-clippings/', include('clippingsParser.urls')),
     path('admin/', admin.site.urls),
 ]
