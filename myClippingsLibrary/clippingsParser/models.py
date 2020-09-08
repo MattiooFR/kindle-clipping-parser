@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class Library(models.Model):
@@ -12,7 +13,7 @@ class Book(models.Model):
     library = models.ForeignKey(Library, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     author = models.CharField(default='Unknown Author', max_length=70)
-    read_date = models.DateTimeField('book read date')
+    read_date = models.DateTimeField('book read date', default=timezone.now())
 
     def __str__(self):
         return f"{self.title}, {self.author}, {self.library.title}"
