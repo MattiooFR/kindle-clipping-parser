@@ -1,4 +1,6 @@
 from django.http import HttpResponse
+from django.template import loader
+
 from .models import Book
 
 
@@ -9,7 +11,12 @@ def index(request):
 def library(request, library):
     books = ', '.join([str(b)
                        for b in Book.objects.filter(library__title=library)])
-    return HttpResponse("This is the library id : {} with these books {}".format(library, books))
+    template = loader.get_template('clippingsParser/library.html')
+    context = {
+        'books': books,
+        'library': library
+    }
+    return HttpResponse(template.render(context, request))
 
 
 def book(request, library_title, book_id):

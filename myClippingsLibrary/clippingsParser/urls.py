@@ -4,6 +4,6 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('<str:library>/', views.library, name='library'),
-    path('<str:library_title>/<int:book_id>/', views.book, name='book')
+    path('library/<str:library>/', views.library, name='library'),
+    path('book/<int:book_id>/', views.book, name='book')
 ]
