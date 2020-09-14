@@ -10,7 +10,7 @@
     <ul>
       {% for library in librarys %}
       <li>
-        <a href="/library/{{ library.title }}/">{{ library.title }}</a>
+        <a href="{% url 'library' library.title %}">{{ library.title }}</a>
       </li>
       {% endfor %}
     </ul>

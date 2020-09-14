@@ -9,7 +9,7 @@
     <p>{{ title }}{% if author %} written by {{ author }}{% endif %}</p>
     <p>
       This book is stored in this library :
-      <a href="/library/{{ library_title }}/">{{ library_title }}</a>
+      <a href="{% url 'library' library_title %}">{{ library_title }}</a>
     </p>
     {% else %}
     <p>This book doesn't exist</p>
