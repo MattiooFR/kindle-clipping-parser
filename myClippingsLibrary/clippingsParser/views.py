@@ -9,8 +9,8 @@ def index(request):
 
 
 def library(request, library):
-    books = ', '.join([str(b)
-                       for b in Book.objects.filter(library__title=library)])
+    books = Book.objects.filter(library__title=library)
+
     template = loader.get_template('clippingsParser/library.html')
     context = {
         'books': books,
@@ -19,5 +19,14 @@ def library(request, library):
     return HttpResponse(template.render(context, request))
 
 
-def book(request, library_title, book_id):
-    return HttpResponse("This is the book page for the book id : {}".format(book_id))
+def book(request, book_id):
+    book = Book.objects.get(pk=book_id)
+
+    template = loader.get_template('clippingsParser/book.html')
+    context = {
+        'title': book.title,
+        'author': book.author,
+        'library_title': book.library.title,
+        'read_date': book.read_date
+    }
+    return HttpResponse(template.render(context, request))
