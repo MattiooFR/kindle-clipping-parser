@@ -1,9 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, get_list_or_404
+from django.http import Http404
 from .models import Book, Library
 
 
 def index(request):
     librarys = Library.objects.all()
+
+    librarys = list(Library.objects.all())
+    if not librarys:
+        raise Http404("No Library matches the given query.")
 
     context = {
         'librarys': librarys
@@ -12,7 +17,7 @@ def index(request):
 
 
 def library(request, library):
-    books = Book.objects.filter(library__title=library)
+    books = get_list_or_404(Book, library__title=library)
 
     context = {
         'books': books,
@@ -22,7 +27,7 @@ def library(request, library):
 
 
 def book(request, book_id):
-    book = Book.objects.get(pk=book_id)
+    book = get_object_or_404(Book, pk=book_id)
 
     context = {
         'title': book.title,
