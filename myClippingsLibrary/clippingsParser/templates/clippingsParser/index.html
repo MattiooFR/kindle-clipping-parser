@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Kindle clippings manager</title>
+  </head>
+  <body>
+    {% if librarys %}
+    <p>All the available librarys :</p>
+    <ul>
+      {% for library in librarys %}
+      <li>
+        <a href="/library/{{ library.title }}/">{{ library.title }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>You need to create your first Library</p>
+    {% endif %}
+  </body>
+</html>

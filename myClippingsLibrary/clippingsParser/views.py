@@ -1,11 +1,17 @@
 from django.http import HttpResponse
 from django.template import loader
 
-from .models import Book
+from .models import Book, Library
 
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the Clippings index.")
+    librarys = Library.objects.all()
+
+    template = loader.get_template('clippingsParser/index.html')
+    context = {
+        'librarys': librarys
+    }
+    return HttpResponse(template.render(context, request))
 
 
 def library(request, library):
