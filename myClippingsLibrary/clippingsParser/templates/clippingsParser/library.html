@@ -9,7 +9,7 @@
     <ul>
       {% for book in books %}
       <li>
-        <a href="{% url 'book' book.id %}"
+        <a href="{% url 'clippingsParser:book' book.id %}"
           >{{ book.title }} - {{ book.author }}</a
         >
       </li>
