@@ -7,9 +7,9 @@
   <body>
     {% if books %}
     <ul>
-      {% for question in latest_question_list %}
+      {% for book in books %}
       <li>
-        <a href="/book/{{ books.id }}/">{{ question.question_text }}</a>
+        <a href="/book/{{ book.id }}/">{{ book.title }} - {{ book.author }}</a>
       </li>
       {% endfor %}
     </ul>
