@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.http import Http404
-from .models import Book, Library
+from .models import Book, Library, Clip
 
 
 def index(request):
@@ -28,11 +28,12 @@ def library(request, library):
 
 def book(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
-
+    clippings = Clip.objects.filter(book=book)
     context = {
         'title': book.title,
         'author': book.author,
         'library_title': book.library.title,
-        'read_date': book.read_date
+        'read_date': book.read_date,
+        'clippings': clippings
     }
     return render(request, 'clippingsParser/book.html', context)
