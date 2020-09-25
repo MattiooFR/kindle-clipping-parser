@@ -5,6 +5,11 @@
     <title>Kindle clippings manager</title>
   </head>
   <body>
+    <form enctype="multipart/form-data" action="{% url 'clippingsParser:index' %}" method="post">
+      {% csrf_token %}
+      <input type="file" name="clippings" />
+      <button type="submit">Upload</button>
+    </form>
     {% if librarys %}
     <p>All the available librarys :</p>
     <ul>

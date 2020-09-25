@@ -35,8 +35,3 @@ class BookView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context['clippings'] = context['book'].clippings.all()
         return context
-
-
-class UploadFileForm(forms.Form):
-    title = forms.CharField(max_length=50)
-    file = forms.FileField()
