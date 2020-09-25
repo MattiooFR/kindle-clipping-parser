@@ -1,39 +1,42 @@
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.http import Http404
 from .models import Book, Library, Clip
+from django import forms
+from django.views import generic
 
 
-def index(request):
-    librarys = Library.objects.all()
+class IndexView(generic.ListView):
+    template_name = 'clippingsParser/index.html'
+    context_object_name = 'librarys'
 
-    librarys = list(Library.objects.all())
-    if not librarys:
-        raise Http404("No Library matches the given query.")
-
-    context = {
-        'librarys': librarys
-    }
-    return render(request, 'clippingsParser/index.html', context)
+    def get_queryset(self):
+        return list(Library.objects.all())
 
 
-def library(request, library):
-    books = get_list_or_404(Book, library__title=library)
+class LibraryView(generic.ListView):
+    model = Library
+    template_name = 'clippingsParser/library.html'
+    context_object_name = 'books'
 
-    context = {
-        'books': books,
-        'library': library
-    }
-    return render(request, 'clippingsParser/library.html', context)
+    def get_queryset(self):
+        return get_list_or_404(Book, library__title=self.kwargs['library'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['library'] = self.kwargs['library']
+        return context
 
 
-def book(request, book_id):
-    book = get_object_or_404(Book, pk=book_id)
-    clippings = Clip.objects.filter(book=book)
-    context = {
-        'title': book.title,
-        'author': book.author,
-        'library_title': book.library.title,
-        'read_date': book.read_date,
-        'clippings': clippings
-    }
-    return render(request, 'clippingsParser/book.html', context)
+class BookView(generic.DetailView):
+    model = Book
+    template_name = 'clippingsParser/book.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['clippings'] = context['book'].clippings.all()
+        return context
+
+
+class UploadFileForm(forms.Form):
+    title = forms.CharField(max_length=50)
+    file = forms.FileField()

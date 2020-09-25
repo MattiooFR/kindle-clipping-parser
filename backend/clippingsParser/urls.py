@@ -4,7 +4,7 @@ from . import views
 
 app_name = 'clippingsParser'
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('library/<str:library>/', views.library, name='library'),
-    path('book/<int:book_id>/', views.book, name='book')
+    path('', views.IndexView.as_view(), name='index'),
+    path('library/<str:library>/', views.LibraryView.as_view(), name='library'),
+    path('book/<int:pk>/', views.BookView.as_view(), name='book')
 ]

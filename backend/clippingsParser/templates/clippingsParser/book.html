@@ -5,8 +5,10 @@
     <title>Kindle clippings manager</title>
   </head>
   <body>
-    {% if title %}
-    <p>{{ title }}{% if author %} written by {{ author }}{% endif %}</p>
+    {% if book.title %}
+    <p>
+      {{ book.title }}{% if book.author %} written by {{ book.author }}{% endif %}
+    </p>
     {% if clippings %}
     <ul>
       {% for clip in clippings %}
@@ -20,8 +22,7 @@
     {% endif %}
     <p>
       This book is stored in this library :
-      <a href="{% url 'clippingsParser:library' library_title %}"
-        >{{ library_title }}</a
+      <a href="{% url 'clippingsParser:library' book.library.title %}">{{ book.library.title }}</a
       >
     </p>
     {% else %}
