@@ -10,7 +10,8 @@ class Library(models.Model):
 
 
 class Book(models.Model):
-    library = models.ForeignKey(Library, on_delete=models.CASCADE)
+    library = models.ForeignKey(
+        Library, on_delete=models.CASCADE, related_name='libraries')
     title = models.CharField(max_length=100)
     author = models.CharField(default='Unknown Author', max_length=70)
     read_date = models.DateTimeField(
@@ -21,7 +22,8 @@ class Book(models.Model):
 
 
 class Clip(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    book = models.ForeignKey(
+        Book, on_delete=models.CASCADE, related_name='clippings')
     content = models.CharField(max_length=5000)
     book_location = models.IntegerField(default=0)
 
