@@ -1,7 +1,5 @@
-from django.shortcuts import render, get_object_or_404, get_list_or_404
-from django.http import Http404
+from django.shortcuts import get_list_or_404
 from .models import Book, Library, Clip
-from django import forms
 from django.views import generic
 
 
