@@ -1,22 +1,17 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Kindle clippings manager</title>
-  </head>
-  <body>
-    {% if books %}
-    <ul>
-      {% for book in books %}
-      <li>
-        <a href="{% url 'clippingsParser:book' book.id %}"
-          >{{ book.title }} - {{ book.author }}</a
-        >
-      </li>
-      {% endfor %}
-    </ul>
-    {% else %}
-    <p>No books in this {{ library }}</p>
-    {% endif %}
-  </body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+  {% if books %}
+  <ul>
+    {% for book in books %}
+    <li>
+      <a href="{% url 'clippingsParser:book' book.id %}"
+        >{{ book.title }} - {{ book.author }}</a
+      >
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No books in this {{ library }}</p>
+  {% endif %}
+{% endblock %}

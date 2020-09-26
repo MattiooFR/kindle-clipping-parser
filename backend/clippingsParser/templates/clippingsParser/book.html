@@ -1,32 +1,29 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Kindle clippings manager</title>
-  </head>
-  <body>
-    {% if book.title %}
-    <p>
-      {{ book.title }}{% if book.author %} written by {{ book.author }}{% endif %}
-    </p>
-    {% if clippings %}
-    <ul>
-      {% for clip in clippings %}
-      <li>
-        {{ clip.content }} <br />Location in the book {{ clip.book_location }}
-      </li>
-      {% endfor %}
-    </ul>
-    {% else %}
-    <p>You don't have any clippings saved in this book.</p>
-    {% endif %}
-    <p>
-      This book is stored in this library :
-      <a href="{% url 'clippingsParser:library' book.library.title %}">{{ book.library.title }}</a
-      >
-    </p>
-    {% else %}
-    <p>This book doesn't exist</p>
-    {% endif %}
-  </body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+
+  {% if book.title %}
+  <p>
+    {{ book.title }}{% if book.author %} written by {{ book.author }}{% endif %}
+  </p>
+  {% if clippings %}
+  <ul>
+    {% for clip in clippings %}
+    <li>
+      {{ clip.content }} <br />Location in the book {{ clip.book_location }}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>You don't have any clippings saved in this book.</p>
+  {% endif %}
+  <p>
+    This book is stored in this library :
+    <a href="{% url 'clippingsParser:library' book.library.title %}">{{ book.library.title }}</a
+    >
+  </p>
+  {% else %}
+  <p>This book doesn't exist</p>
+  {% endif %}
+
+{% endblock %}
