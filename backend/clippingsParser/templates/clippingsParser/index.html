@@ -14,9 +14,9 @@
   <ul>
     {% for library in librarys %}
     <li>
-      <a href="{% url 'clippingsParser:library' library.title %}"
-        >{{ library.pk }} - {{ library.title }}</a
-      >
+      <a href="{% url 'clippingsParser:library' library.title %}">
+        {{ library.pk }} - {{ library.title }}
+      </a>
     </li>
     {% endfor %}
   </ul>
