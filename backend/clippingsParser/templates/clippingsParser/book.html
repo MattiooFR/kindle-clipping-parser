@@ -1,5 +1,13 @@
 {% extends 'base.html' %}
 
+{% block title %}
+  {% if book.title %}
+    {{ book.title }}
+  {% else %}
+    This book doesn't exist
+  {% endif %}
+{% endblock %}
+
 {% block content %}
 
   {% if book.title %}
