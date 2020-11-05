@@ -1,14 +1,14 @@
 from django.shortcuts import get_list_or_404
-from django.http import HttpResponseRedirect
 
 from .models import Book, Library, Clip
 from django.views import generic
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from .forms import UploadClippingsFileForm
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse_lazy
 
 import re
+import dateutil
 
 
 def import_clippings(library_title, clippings):
@@ -23,7 +23,9 @@ def import_clippings(library_title, clippings):
             clipping = "".join(line.split("\n")[3:]).strip()
             clip_metadata = line.split("\n")[1].strip()
             book_location = clip_metadata.split(" | ")[0].split(" ")[-1].split("-")[0]
-            date_read = clip_metadata.split(" | ")[1].split("Added on ")[1].strip()
+            date_read = dateutil.parser.parse(
+                clip_metadata.split(" | ")[1].split("Added on ")[1].strip()
+            )
 
             if not Book.objects.filter(title=title, library=library):
                 book = Book(library=library, title=title)
@@ -48,7 +50,7 @@ class IndexView(generic.ListView, generic.edit.FormMixin):
         form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
             import_clippings(request.POST["library_title"], request.FILES["file"])
-            return HttpResponseRedirect(self.success_url)
+            return redirect(self.success_url)
         return render(request, self.template_name, {"form": form})
 
 

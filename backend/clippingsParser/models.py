@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+import datetime
 
 
 class Library(models.Model):
@@ -25,6 +26,7 @@ class Clip(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="clippings")
     content = models.CharField(max_length=5000)
     book_location = models.IntegerField(default=0)
+    date_read = models.DateTimeField(default=datetime.datetime(1900, 1, 1))
 
     def __str__(self):
         return f"{self.book.title}, {self.content}, {self.book_location}"
