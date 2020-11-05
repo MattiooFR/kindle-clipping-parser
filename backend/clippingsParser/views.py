@@ -11,9 +11,9 @@ from django.urls import reverse_lazy, reverse
 import re
 
 
-def import_clippings(clippings):
+def import_clippings(library_title, clippings):
     strings = re.split(r"==========", clippings.read().decode("utf-8"))
-    library = Library(title="Library")
+    library = Library(title=library_title)
     library.save()
 
     for line in strings:
@@ -47,7 +47,7 @@ class IndexView(generic.ListView, generic.edit.FormMixin):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
-            import_clippings(request.FILES["file"])
+            import_clippings(request.POST["library_title"], request.FILES["file"])
             return HttpResponseRedirect(self.success_url)
         return render(request, self.template_name, {"form": form})
 
