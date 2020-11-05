@@ -28,12 +28,17 @@ def import_clippings(library_title, clippings):
             )
 
             if not Book.objects.filter(title=title, library=library):
-                book = Book(library=library, title=title)
+                book = Book(library=library, title=title, read_date=date_read)
                 book.save()
             else:
                 book = Book.objects.get(title=title, library=library)
 
-            clip = Clip(book=book, content=clipping, book_location=book_location)
+            clip = Clip(
+                book=book,
+                content=clipping,
+                book_location=book_location,
+                date_read=date_read,
+            )
             clip.save()
 
 
