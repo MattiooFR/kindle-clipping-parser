@@ -8,7 +8,7 @@ from .forms import UploadClippingsFileForm
 from django.urls import reverse_lazy
 
 import re
-import dateutil
+from dateutil.parser import parse as dateparser
 
 
 def import_clippings(library_title, clippings):
@@ -23,7 +23,7 @@ def import_clippings(library_title, clippings):
             clipping = "".join(line.split("\n")[3:]).strip()
             clip_metadata = line.split("\n")[1].strip()
             book_location = clip_metadata.split(" | ")[0].split(" ")[-1].split("-")[0]
-            date_read = dateutil.parser.parse(
+            date_read = dateparser(
                 clip_metadata.split(" | ")[1].split("Added on ")[1].strip()
             )
 
