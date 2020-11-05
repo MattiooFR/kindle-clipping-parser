@@ -6,7 +6,7 @@ from django.views import generic
 from django.shortcuts import render
 
 from .forms import UploadClippingsFileForm
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 
 import re
 
@@ -17,24 +17,29 @@ def import_clippings(clippings):
     library.save()
 
     for line in strings:
-        title = line.strip().split("\n")[0].strip()
-        clipping = "".join(line.split("\n")[3:])
+        if len(line) >= 5:
+            line = line.strip()
+            title = line.split("\n")[0].strip()
+            clipping = "".join(line.split("\n")[3:]).strip()
+            clip_metadata = line.split("\n")[1].strip()
+            book_location = clip_metadata.split(" | ")[0].split(" ")[-1].split("-")[0]
+            date_read = clip_metadata.split(" | ")[1].split("Added on ")[1].strip()
 
-        if not Book.objects.filter(title=title, library=library):
-            book = Book(library=library, title=title)
-            book.save()
-        else:
-            book = Book.objects.get(title=title, library=library)
+            if not Book.objects.filter(title=title, library=library):
+                book = Book(library=library, title=title)
+                book.save()
+            else:
+                book = Book.objects.get(title=title, library=library)
 
-        clip = Clip(book=book, content=clipping)
-        clip.save()
+            clip = Clip(book=book, content=clipping, book_location=book_location)
+            clip.save()
 
 
 class IndexView(generic.ListView, generic.edit.FormMixin):
     template_name = "clippingsParser/index.html"
     context_object_name = "librarys"
     form_class = UploadClippingsFileForm
-    success_url = reverse_lazy("index")
+    success_url = reverse_lazy("clippingsParser:index")
 
     def get_queryset(self):
         return list(Library.objects.all())
@@ -43,7 +48,7 @@ class IndexView(generic.ListView, generic.edit.FormMixin):
         form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
             import_clippings(request.FILES["file"])
-            return HttpResponseRedirect("")
+            return HttpResponseRedirect(self.success_url)
         return render(request, self.template_name, {"form": form})
 
 
