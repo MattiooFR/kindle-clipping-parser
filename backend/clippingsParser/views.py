@@ -12,33 +12,66 @@ from dateutil.parser import parse as dateparser
 
 
 def import_clippings(library_title, clippings):
+    """Parse the clippings file text and save the books and clips in the database
+
+    Args:
+        library_title (string): The name of the library to save datas in
+        clippings (text file): The text file that contains all the clippings
+    """
+
+    # Parse the file text by clippings
     strings = re.split(r"==========", clippings.read().decode("utf-8"))
     library = Library(title=library_title)
     library.save()
 
+    # Each line represent a highlighted clip
     for line in strings:
+        # To prevent error when parsing empty clip
         if len(line) >= 5:
             line = line.strip()
+
+            # Extract the title
             title = line.split("\n")[0].strip()
+
+            # Extract the highlighted content
             clipping = "".join(line.split("\n")[3:]).strip()
+
+            # Extract the clip metadata, such as book location and when it was highlighted
             clip_metadata = line.split("\n")[1].strip()
             book_location = clip_metadata.split(" | ")[0].split(" ")[-1].split("-")[0]
             date_read = dateparser(
                 clip_metadata.split(" | ")[1].split("Added on ")[1].strip()
             )
 
+            # Create a book in the database if it doesn't exist
+            # or get the book corresponding to the clip
             if not Book.objects.filter(title=title, library=library):
                 book = Book(library=library, title=title, read_date=date_read)
                 book.save()
             else:
                 book = Book.objects.get(title=title, library=library)
 
-            clip = Clip(
+            # There are sometime dupplicate of clippings in the text file because kindle
+            # keeps previously edited clippings, this is to keep the latest
+            if Clip.objects.filter(
                 book=book,
-                content=clipping,
+                content__startswith=clipping[: len(clipping) // 3],
                 book_location=book_location,
-                date_read=date_read,
-            )
+            ).exists():
+                clip = Clip.objects.get(
+                    book=book,
+                    content__startswith=clipping[: len(clipping) // 3],
+                    book_location=book_location,
+                )
+                clip.content = clipping
+            else:
+                # Save the highlight in the database
+                clip = Clip(
+                    book=book,
+                    content=clipping,
+                    book_location=book_location,
+                    date_read=date_read,
+                )
             clip.save()
 
 
