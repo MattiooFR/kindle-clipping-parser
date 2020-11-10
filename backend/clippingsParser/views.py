@@ -11,6 +11,37 @@ import re
 from dateutil.parser import parse as dateparser
 
 
+import urllib.request
+import urllib.parse
+import json
+import textwrap
+
+
+def google_book(search):
+
+    base_api_link = "https://www.googleapis.com/books/v1/volumes?q="
+
+    with urllib.request.urlopen(base_api_link + urllib.parse.quote(search)) as f:
+        text = f.read()
+
+    decoded_text = text.decode("utf-8")
+    obj = json.loads(decoded_text)  # deserializes decoded_text to a Python object
+    volume_info = obj["items"][0]
+    authors = volume_info["volumeInfo"].get("authors", [])
+
+    book = {}
+
+    book["title"] = volume_info["volumeInfo"].get("title")
+    book["summary"] = volume_info.get("searchInfo", {}).get(
+        "textSnippet", "No summary found"
+    )
+    book["authors"] = ", ".join(authors)
+    book["page_number"] = volume_info["volumeInfo"].get("pageCount")
+    book["language"] = volume_info["volumeInfo"].get("language")
+
+    return book
+
+
 def import_clippings(library_title, clippings):
     """Parse the clippings file text and save the books and clips in the database
 
@@ -45,8 +76,13 @@ def import_clippings(library_title, clippings):
 
             # Create a book in the database if it doesn't exist
             # or get the book corresponding to the clip
+
             if not Book.objects.filter(title=title, library=library):
-                book = Book(library=library, title=title, read_date=date_read)
+                book = Book(
+                    library=library,
+                    title=title,
+                    read_date=date_read,
+                )
                 book.save()
             else:
                 book = Book.objects.get(title=title, library=library)
@@ -73,6 +109,12 @@ def import_clippings(library_title, clippings):
                     date_read=date_read,
                 )
             clip.save()
+
+    for book in Book.objects.filter(library=library):
+        gbook = google_book(book.title)
+        book.title = gbook["title"]
+        book.author = gbook["authors"]
+        book.save()
 
 
 class IndexView(generic.ListView, generic.edit.FormMixin):
