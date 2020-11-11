@@ -14,7 +14,6 @@ from dateutil.parser import parse as dateparser
 import urllib.request
 import urllib.parse
 import json
-import textwrap
 
 
 def google_book(search):
@@ -51,24 +50,36 @@ def import_clippings(library_title, clippings):
     """
 
     # Parse the file text by clippings
-    strings = re.split(r"==========", clippings.read().decode("utf-8"))
+    highlight_separator = "=========="
+    strings = re.split(highlight_separator, clippings.read().decode("utf-8"))
     library = Library(title=library_title)
     library.save()
 
     # Each line represent a highlighted clip
-    for line in strings:
+    for highlight_string in strings:
         # To prevent error when parsing empty clip
-        if len(line) >= 5:
-            line = line.strip()
+        if len(highlight_string) >= 5:
+            splitted_string = highlight_string.strip().split("\n")
 
             # Extract the title
-            title = line.split("\n")[0].strip()
+            author_line = splitted_string[0].strip()
+            match = re.search(r"\((.*)\)", author_line)
+            authors = re.findall(r"\((.*?)\)", author_line)
+            clipping = splitted_string[3]
 
-            # Extract the highlighted content
-            clipping = "".join(line.split("\n")[3:]).strip()
+            if match:
+                author = authors[-1]
+                book_title = author_line[: match.start()]
+
+                book_title = "".join(
+                    [c for c in book_title if c.isalpha() or c.isdigit() or c == " "]
+                ).rstrip()
+            else:
+                author = "Unknown"
+                book_title = author_line
 
             # Extract the clip metadata, such as book location and when it was highlighted
-            clip_metadata = line.split("\n")[1].strip()
+            clip_metadata = splitted_string[1].strip()
             book_location = clip_metadata.split(" | ")[0].split(" ")[-1].split("-")[0]
             date_read = dateparser(
                 clip_metadata.split(" | ")[1].split("Added on ")[1].strip()
@@ -77,15 +88,16 @@ def import_clippings(library_title, clippings):
             # Create a book in the database if it doesn't exist
             # or get the book corresponding to the clip
 
-            if not Book.objects.filter(title=title, library=library):
+            if not Book.objects.filter(title=book_title, library=library):
                 book = Book(
                     library=library,
-                    title=title,
+                    title=book_title,
                     read_date=date_read,
+                    author=author,
                 )
                 book.save()
             else:
-                book = Book.objects.get(title=title, library=library)
+                book = Book.objects.get(title=book_title, library=library)
 
             # There are sometime dupplicate of clippings in the text file because kindle
             # keeps previously edited clippings, this is to keep the latest
@@ -110,11 +122,11 @@ def import_clippings(library_title, clippings):
                 )
             clip.save()
 
-    for book in Book.objects.filter(library=library):
-        gbook = google_book(book.title)
-        book.title = gbook["title"]
-        book.author = gbook["authors"]
-        book.save()
+    # for book in Book.objects.filter(library=library):
+    #     gbook = google_book(book.title)
+    #     book.title = gbook["title"]
+    #     book.author = gbook["authors"]
+    #     book.save()
 
 
 class IndexView(generic.ListView, generic.edit.FormMixin):
