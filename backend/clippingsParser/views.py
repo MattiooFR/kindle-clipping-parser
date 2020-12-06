@@ -11,36 +11,6 @@ import re
 from dateutil.parser import parse as dateparser
 
 
-import urllib.request
-import urllib.parse
-import json
-
-
-def google_book(search):
-
-    base_api_link = "https://www.googleapis.com/books/v1/volumes?q="
-
-    with urllib.request.urlopen(base_api_link + urllib.parse.quote(search)) as f:
-        text = f.read()
-
-    decoded_text = text.decode("utf-8")
-    obj = json.loads(decoded_text)  # deserializes decoded_text to a Python object
-    volume_info = obj["items"][0]
-    authors = volume_info["volumeInfo"].get("authors", [])
-
-    book = {}
-
-    book["title"] = volume_info["volumeInfo"].get("title")
-    book["summary"] = volume_info.get("searchInfo", {}).get(
-        "textSnippet", "No summary found"
-    )
-    book["authors"] = ", ".join(authors)
-    book["page_number"] = volume_info["volumeInfo"].get("pageCount")
-    book["language"] = volume_info["volumeInfo"].get("language")
-
-    return book
-
-
 def import_clippings(library_title, clippings):
     """Parse the clippings file text and save the books and clips in the database
 

@@ -1,6 +1,9 @@
 from django.db import models
 from django.utils import timezone
 import datetime
+import urllib.request
+import urllib.parse
+import json
 
 
 class Library(models.Model):
@@ -20,6 +23,50 @@ class Book(models.Model):
 
     def __str__(self):
         return f"{self.title}, {self.author}, {self.library.title}"
+
+    def write_book(self, format="markdown"):
+        if self.title is None or len(self.clippings.all()) == 0:
+            print("Not writting because name is None.")
+            return False
+
+        with open(f"books/{self.title}.md", "w+") as file:
+            file.write(f"# {self.title}")
+            file.write("\n")
+            for h in self.clippings.all():
+                clean_text = h.content.replace("\n", " ")
+                file.write(f"- {clean_text}")
+                file.write("\n")
+
+            file.close()
+
+    def google_book(self):
+
+        base_api_link = "https://www.googleapis.com/books/v1/volumes?q="
+
+        with urllib.request.urlopen(
+            base_api_link
+            + urllib.parse.quote(self.title)
+            + " "
+            + urllib.parse.quote(self.author)
+        ) as f:
+            text = f.read()
+
+        decoded_text = text.decode("utf-8")
+        obj = json.loads(decoded_text)  # deserializes decoded_text to a Python object
+        volume_info = obj["items"][0]
+        authors = volume_info["volumeInfo"].get("authors", [])
+
+        book = {}
+
+        book["title"] = volume_info["volumeInfo"].get("title")
+        book["summary"] = volume_info.get("searchInfo", {}).get(
+            "textSnippet", "No summary found"
+        )
+        book["authors"] = ", ".join(authors)
+        book["page_number"] = volume_info["volumeInfo"].get("pageCount")
+        book["language"] = volume_info["volumeInfo"].get("language")
+
+        return book
 
 
 class Clip(models.Model):
