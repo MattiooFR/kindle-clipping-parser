@@ -1,12 +1,13 @@
 from django.shortcuts import get_list_or_404
-
+import json
+from django.http import HttpResponse, HttpRequest
 from .models import Book, Library, Clip
 from django.views import generic
 from django.shortcuts import render, redirect
 
 from .forms import UploadClippingsFileForm
 from django.urls import reverse_lazy
-
+from django.views.decorators.csrf import csrf_exempt
 import re
 from dateutil.parser import parse as dateparser
 
@@ -97,6 +98,12 @@ def import_clippings(library_title, clippings):
     #     book.title = gbook["title"]
     #     book.author = gbook["authors"]
     #     book.save()
+
+
+@csrf_exempt
+def receive_summary(request, book=0):
+    print(json.loads(HttpRequest.read(request))["summary"])
+    return HttpResponse()
 
 
 class IndexView(generic.ListView, generic.edit.FormMixin):
